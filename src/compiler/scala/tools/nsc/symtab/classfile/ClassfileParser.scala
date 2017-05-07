@@ -852,7 +852,12 @@ abstract class ClassfileParser(reader: ReusableInstance[ReusableDataReader]) {
         case tpnme.RuntimeAnnotationATTR =>
           val numAnnots = u2
           for (n <- 0 until numAnnots; annot <- parseAnnotation(u2))
-            sym.addAnnotation(annot)
+            /* `sym.addAnnotation(annot)` adds the annotation to the front of the list,
+             * so if we parsed in classfile order we would wind up with the annotations
+             * in reverse order in `sym.annotations`. Instead we just read them out the
+             * other way around, for now. TODO: sym.addAnnotation add to the end?
+             */
+            sym.setAnnotations(sym.annotations :+ annot)
 
         // TODO 1: parse runtime visible annotations on parameters
         // case tpnme.RuntimeParamAnnotationATTR
