@@ -243,9 +243,9 @@ object PartialFunction {
    */
   private class OrElse[-A, +B] (f1: PartialFunction[A, B], f2: PartialFunction[A, B])
     extends scala.runtime.AbstractPartialFunction[A, B] with Serializable {
-    def isDefinedAt(x: A) = f1.isDefinedAt(x) || f2.isDefinedAt(x)
+    override def isDefinedAt(x: A) = f1.isDefinedAt(x) || f2.isDefinedAt(x)
 
-    protected override def apply(x: A): B = f1.applyOrElse(x, f2.apply(_))
+    /*protected*/ override def apply(x: A): B = f1.applyOrElse(x, f2.apply(_))
 
     override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 = {
       val z = f1.applyOrElse(x, checkFallback[B])
@@ -264,7 +264,7 @@ object PartialFunction {
   private class AndThen[-A, B, +C] (pf: PartialFunction[A, B], k: B => C) extends PartialFunction[A, C] with Serializable {
     def isDefinedAt(x: A) = pf.isDefinedAt(x)
 
-    protected def apply(x: A): C = k(pf(x))
+    /*protected*/ def apply(x: A): C = k(pf(x))
 
     override def applyOrElse[A1 <: A, C1 >: C](x: A1, default: A1 => C1): C1 = {
       val z = pf.applyOrElse(x, checkFallback[B])
@@ -280,7 +280,7 @@ object PartialFunction {
       if (!fallbackOccurred(b)) k.isDefinedAt(b) else false
     }
 
-    protected def apply(x: A): C = k(pf(x))
+    /*protected*/ def apply(x: A): C = k(pf(x))
 
     override def applyOrElse[A1 <: A, C1 >: C](x: A1, default: A1 => C1): C1 = {
       val pfv = pf.applyOrElse(x, checkFallback[B])
@@ -323,9 +323,9 @@ object PartialFunction {
   }
 
   private class Unlifted[A, B] (f: A => Option[B]) extends scala.runtime.AbstractPartialFunction[A, B] with Serializable {
-    def isDefinedAt(x: A): Boolean = f(x).isDefined
+    override def isDefinedAt(x: A): Boolean = f(x).isDefined
 
-    protected def apply(x: A): B = f(x).get
+    /*protected*/ override def apply(x: A): B = f(x).get
 
     override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 = {
       f(x).getOrElse(default(x))
@@ -350,7 +350,7 @@ object PartialFunction {
 
   private[this] val empty_pf: PartialFunction[Any, Nothing] = new PartialFunction[Any, Nothing] with Serializable {
     def isDefinedAt(x: Any) = false
-    protected def apply(x: Any): Nothing = throw new MatchError(x)
+    /*protected*/ def apply(x: Any): Nothing = throw new MatchError(x)
     override def applyOrElse[A1 <: Any, B1 >: Nothing](x: A1, default: A1 => B1): B1 = default(x)
     override def orElse[A1, B1](that: PartialFunction[A1, B1]) = that
     override def andThen[C](k: Nothing => C) = this

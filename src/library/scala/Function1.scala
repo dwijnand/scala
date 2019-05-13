@@ -63,9 +63,9 @@ object Function1 {
  */
 @annotation.implicitNotFound(msg = "No implicit view available from ${T1} => ${R}.")
 trait Function1[@specialized(Specializable.Arg) -T1, @specialized(Specializable.Return) +R] extends PartialFunction[T1, R] { self =>
-  final def isDefinedAt(x: T1): Boolean = true
+  /*final*/ def isDefinedAt(x: T1): Boolean = true
 
-  final override def applyOrElse[A1 <: T1, B1 >: R](x: A1, default: A1 => B1): B1 = apply(x)
+//  final override def applyOrElse[A1 <: T1, B1 >: R](x: A1, default: A1 => B1): B1 = apply(x)
 
   /** Apply the body of this function to the argument.
    *  @return   the result of function application.
