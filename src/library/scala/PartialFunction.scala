@@ -63,24 +63,24 @@ package scala
  *
  *  @since   1.0
  */
-trait PartialFunction[-A, +B] extends (A => B) { self =>
+trait PartialFunction[-A, +B] { self =>
   import PartialFunction._
 
-  /** Tries to extract a `B` from an `A` in a pattern matching expression. */
-  def unapply(a: A): Option[B] = lift(a)
+//  /** Tries to extract a `B` from an `A` in a pattern matching expression. */
+//  def unapply(a: A): Option[B] = lift(a)
 
-  /** Returns an extractor object with a `unapplySeq` method, which extracts each element of a sequence data.
-   *
-   *  @example {{{
-   *           val firstChar: String => Option[Char] = _.headOption
-   *
-   *           Seq("foo", "bar", "baz") match {
-   *             case firstChar.unlift.elementWise(c0, c1, c2) =>
-   *               println(s"$c0, $c1, $c2") // Output: f, b, b
-   *           }
-   *           }}}
-   */
-  def elementWise = new ElementWiseExtractor(this)
+//  /** Returns an extractor object with a `unapplySeq` method, which extracts each element of a sequence data.
+//   *
+//   *  @example {{{
+//   *           val firstChar: String => Option[Char] = _.headOption
+//   *
+//   *           Seq("foo", "bar", "baz") match {
+//   *             case firstChar.unlift.elementWise(c0, c1, c2) =>
+//   *               println(s"$c0, $c1, $c2") // Output: f, b, b
+//   *           }
+//   *           }}}
+//   */
+//  def elementWise = new ElementWiseExtractor(this)
 
   /** Checks if a value is contained in the function's domain.
    *
@@ -88,6 +88,8 @@ trait PartialFunction[-A, +B] extends (A => B) { self =>
    *  @return `'''true'''`, iff `x` is in the domain of this function, `'''false'''` otherwise.
    */
   def isDefinedAt(x: A): Boolean
+
+  protected def apply(x: A): B
 
   /** Composes this partial function with a fallback partial function which
    *  gets applied where this partial function is not defined.
@@ -115,7 +117,7 @@ trait PartialFunction[-A, +B] extends (A => B) { self =>
    *           possibly narrowed by the specified function, which maps
    *           arguments `x` to `k(this(x))`.
    */
-  override def andThen[C](k: B => C): PartialFunction[A, C] = k match {
+  def andThen[C](k: B => C): PartialFunction[A, C] = k match {
     case pf: PartialFunction[B, C] => andThen(pf)
     case _                         => new AndThen[A, B, C](this, k)
   }
@@ -207,6 +209,9 @@ trait PartialFunction[-A, +B] extends (A => B) { self =>
     val z = applyOrElse(x, checkFallback[B])
     if (!fallbackOccurred(z)) { action(z); true } else false
   }
+
+  def orThrow[B1 >: B](implicit ev: Throwable <:< A): Throwable => B1 =
+    t => applyOrElse(ev(t), Function.const(throw t))
 }
 
 /** A few handy operations which leverage the extra bit of information
@@ -225,14 +230,14 @@ trait PartialFunction[-A, +B] extends (A => B) { self =>
  */
 object PartialFunction {
 
-  final class ElementWiseExtractor[-A, +B] private[PartialFunction] (private val pf: PartialFunction[A, B]) extends AnyVal {
-    def unapplySeq(seq: Seq[A]): Option[Seq[B]] = {
-      Some(seq.map {
-        case pf(b) => b
-        case _ => return None
-      })
-    }
-  }
+//  final class ElementWiseExtractor[-A, +B] private[PartialFunction] (private val pf: PartialFunction[A, B]) extends AnyVal {
+//    def unapplySeq(seq: Seq[A]): Option[Seq[B]] = {
+//      Some(seq.map {
+//        case pf(b) => b
+//        case _ => return None
+//      })
+//    }
+//  }
 
   /** Composite function produced by `PartialFunction#orElse` method
    */
@@ -240,7 +245,7 @@ object PartialFunction {
     extends scala.runtime.AbstractPartialFunction[A, B] with Serializable {
     def isDefinedAt(x: A) = f1.isDefinedAt(x) || f2.isDefinedAt(x)
 
-    override def apply(x: A): B = f1.applyOrElse(x, f2)
+    protected override def apply(x: A): B = f1.applyOrElse(x, f2.apply(_))
 
     override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 = {
       val z = f1.applyOrElse(x, checkFallback[B])
@@ -259,7 +264,7 @@ object PartialFunction {
   private class AndThen[-A, B, +C] (pf: PartialFunction[A, B], k: B => C) extends PartialFunction[A, C] with Serializable {
     def isDefinedAt(x: A) = pf.isDefinedAt(x)
 
-    def apply(x: A): C = k(pf(x))
+    protected def apply(x: A): C = k(pf(x))
 
     override def applyOrElse[A1 <: A, C1 >: C](x: A1, default: A1 => C1): C1 = {
       val z = pf.applyOrElse(x, checkFallback[B])
@@ -275,7 +280,7 @@ object PartialFunction {
       if (!fallbackOccurred(b)) k.isDefinedAt(b) else false
     }
 
-    def apply(x: A): C = k(pf(x))
+    protected def apply(x: A): C = k(pf(x))
 
     override def applyOrElse[A1 <: A, C1 >: C](x: A1, default: A1 => C1): C1 = {
       val pfv = pf.applyOrElse(x, checkFallback[B])
@@ -304,9 +309,9 @@ object PartialFunction {
    *
    *  Here `fallback_pf` is used as both unique marker object and special fallback function that returns it.
    */
-  private[this] val fallback_pf: PartialFunction[Any, Any] = { case _ => fallback_pf }
-  private def checkFallback[B] = fallback_pf.asInstanceOf[PartialFunction[Any, B]]
-  private def fallbackOccurred[B](x: B) = (fallback_pf eq x.asInstanceOf[AnyRef])
+  private[this] val fallback_pf: Any => Any = _ => fallback_pf
+  private def checkFallback[B] = fallback_pf.asInstanceOf[Any => B]
+  private def fallbackOccurred[B](x: B) = fallback_pf eq x.asInstanceOf[AnyRef]
 
   private class Lifted[-A, +B] (val pf: PartialFunction[A, B])
       extends scala.runtime.AbstractFunction1[A, Option[B]] with Serializable {
@@ -319,6 +324,8 @@ object PartialFunction {
 
   private class Unlifted[A, B] (f: A => Option[B]) extends scala.runtime.AbstractPartialFunction[A, B] with Serializable {
     def isDefinedAt(x: A): Boolean = f(x).isDefined
+
+    protected def apply(x: A): B = f(x).get
 
     override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 = {
       f(x).getOrElse(default(x))
@@ -337,16 +344,17 @@ object PartialFunction {
    *   @param  f  an ordinary function
    *   @return    a partial function which delegates to the ordinary function `f`
    */
-  def fromFunction[A, B](f: A => B): PartialFunction[A, B] = { case x => f(x) }
+  def fromFunction[A, B](f: A => B): PartialFunction[A, B] = f
 
   private[this] val constFalse: Any => Boolean = { _ => false}
 
   private[this] val empty_pf: PartialFunction[Any, Nothing] = new PartialFunction[Any, Nothing] with Serializable {
     def isDefinedAt(x: Any) = false
-    def apply(x: Any) = throw new MatchError(x)
+    protected def apply(x: Any): Nothing = throw new MatchError(x)
+    override def applyOrElse[A1 <: Any, B1 >: Nothing](x: A1, default: A1 => B1): B1 = default(x)
     override def orElse[A1, B1](that: PartialFunction[A1, B1]) = that
     override def andThen[C](k: Nothing => C) = this
-    override val lift = (x: Any) => None
+    override val lift = (_: Any) => None
     override def runWith[U](action: Nothing => U) = constFalse
   }
 

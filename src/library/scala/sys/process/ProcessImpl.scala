@@ -120,7 +120,7 @@ private[process] trait ProcessImpl {
 
     protected[this] def runInterruptible[T](action: => T)(destroyImpl: => Unit): Option[T] = {
       try   Some(action)
-      catch onInterrupt { destroyImpl; None }
+      catch onInterrupt { destroyImpl; None }.orThrow
     }
   }
 
@@ -152,13 +152,13 @@ private[process] trait ProcessImpl {
         catch onError { err =>
           releaseResources(source, sink)
           throw err
-        }
+        }.orThrow
       val first =
         try a.run(firstIO)
         catch onError { err =>
           releaseResources(source, sink, second)
           throw err
-        }
+        }.orThrow
       runInterruptible {
         val exit1 = first.exitValue()
         source.done()
@@ -179,7 +179,7 @@ private[process] trait ProcessImpl {
 
     private[process] def runloop(src: InputStream, dst: OutputStream): Unit = {
       try     BasicIO.transferFully(src, dst)
-      catch   ioFailure(ioHandler)
+      catch   ioFailure(ioHandler).orThrow
       finally BasicIO close {
         if (isSink) dst else src
       }
@@ -198,7 +198,7 @@ private[process] trait ProcessImpl {
           case None =>
         }
       try go()
-      catch onInterrupt(())
+      catch onInterrupt(()).orThrow
       finally BasicIO close pipe
     }
     def connectIn(in: InputStream): Unit = source.put(Some(in))
@@ -221,7 +221,7 @@ private[process] trait ProcessImpl {
           case None =>
         }
       try go()
-      catch onInterrupt(())
+      catch onInterrupt(()).orThrow
       finally BasicIO close pipe
     }
     def connectOut(out: OutputStream): Unit = sink.put(Some(out))

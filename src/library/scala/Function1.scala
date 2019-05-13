@@ -62,7 +62,11 @@ object Function1 {
  *  is that the latter can specify inputs which it will not handle.
  */
 @annotation.implicitNotFound(msg = "No implicit view available from ${T1} => ${R}.")
-trait Function1[@specialized(Specializable.Arg) -T1, @specialized(Specializable.Return) +R] extends AnyRef { self =>
+trait Function1[@specialized(Specializable.Arg) -T1, @specialized(Specializable.Return) +R] extends PartialFunction[T1, R] { self =>
+  final def isDefinedAt(x: T1): Boolean = true
+
+  final override def applyOrElse[A1 <: T1, B1 >: R](x: A1, default: A1 => B1): B1 = apply(x)
+
   /** Apply the body of this function to the argument.
    *  @return   the result of function application.
    */
@@ -82,7 +86,7 @@ trait Function1[@specialized(Specializable.Arg) -T1, @specialized(Specializable.
    *  @param    g   a function R => A
    *  @return       a new function `f` such that `f(x) == g(apply(x))`
    */
-  @annotation.unspecialized def andThen[A](g: R => A): T1 => A = { x => g(apply(x)) }
+  @annotation.unspecialized override def andThen[A](g: R => A): T1 => A = { x => g(apply(x)) }
 
   override def toString(): String = "<function1>"
 }
