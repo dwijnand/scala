@@ -74,7 +74,7 @@
       [1607][1607][1607]C.this.toString()
     } catch {
       [1505]case [1505](ex6 @ [1505]_) => [1505]{
-        [1812]<synthetic> val x4: [1812]Throwable = [1812]ex6;
+        [1812]<synthetic> val x4: [1812]Throwable = [1505]([1505]ex6: [1505]Throwable @unchecked);
         [1505]case9(){
           [1812]if ([1812][1812]x4.ne([1812]null))
             [1812]{

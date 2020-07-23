@@ -262,12 +262,15 @@ trait MatchTranslation {
 
           val exSym = freshSym(pos, pureType(ThrowableTpe), "ex")
 
+          val unchecked = AnnotationInfo(UncheckedClass.tpe, Nil, Nil)
+          val scrut = atPos(pos)(Typed(REF(exSym), TypeTree(pureType(ThrowableTpe).withAnnotation(unchecked))))
+
           List(
               atPos(pos) {
                 CaseDef(
                   Bind(exSym, Ident(nme.WILDCARD)), // TODO: does this need fixing upping?
                   EmptyTree,
-                  combineCasesNoSubstOnly(REF(exSym), scrutSym, casesNoSubstOnly, pt, selectorPos, matchOwner, Some(scrut => Throw(REF(exSym))))
+                  combineCasesNoSubstOnly(scrut, scrutSym, casesNoSubstOnly, pt, selectorPos, matchOwner, Some(scrut => Throw(REF(exSym))))
                 )
               })
         }
