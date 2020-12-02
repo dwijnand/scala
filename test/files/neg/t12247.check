@@ -1,0 +1,6 @@
+t12247.scala:4: warning: match may not be exhaustive.
+  def test(i: Int) = i match {
+                     ^
+error: No warnings can be incurred under -Werror.
+1 warning
+1 error

@@ -612,6 +612,8 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
 
         debug.patmat("combining cases: "+ (casesNoSubstOnly.map(_.mkString(" >> ")).mkString("{", "\n", "}")))
 
+        analyzeCases(scrutSym, casesNoSubstOnly, pt, suppression)
+
         val requireSwitch: Boolean =
           if (settings.XnoPatmatAnalysis) false
           else scrut match {
@@ -652,8 +654,6 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
                     nonTrivLast.nonEmpty && nonTrivLast.head.isInstanceOf[BodyTreeMaker]
                   }) None
               else matchFailGen
-
-            analyzeCases(scrutSym, casesNoSubstOnly, pt, suppression)
 
             val (cases, toHoist) = optimizeCases(scrutSym, casesNoSubstOnly, pt, selectorPos)
 
