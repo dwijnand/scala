@@ -388,11 +388,6 @@ abstract class UnPickler {
         case Nil => NullaryMethodType(restpe)
         case _   => PolyType(tparams, restpe)
       }
-      def CompoundType(clazz: Symbol, parents: List[Type]): Type = tag match {
-        case REFINEDtpe   => RefinedType(parents, symScope(clazz), clazz)
-        case CLASSINFOtpe => ClassInfoType(parents, symScope(clazz), clazz)
-      }
-
       def readThisType(): Type = {
         val sym = readSymbolRef() match {
           case stub: StubSymbol => stub.setFlag(PACKAGE | MODULE)
@@ -404,7 +399,7 @@ abstract class UnPickler {
       // We're stuck with the order types are pickled in, but with judicious use
       // of named parameters we can recapture a declarative flavor in a few cases.
       // But it's still a rat's nest of ad-hockery.
-      (tag: @switch) match {
+      (tag: @switch @unchecked) match {
         case NOtpe                     => NoType
         case NOPREFIXtpe               => NoPrefix
         case THIStpe                   => readThisType()
@@ -413,7 +408,8 @@ abstract class UnPickler {
         case CONSTANTtpe               => ConstantType(readConstantRef())
         case TYPEREFtpe                => TypeRef(readTypeRef(), readSymbolRef(), readTypes())
         case TYPEBOUNDStpe             => TypeBounds(readTypeRef(), readTypeRef())
-        case REFINEDtpe | CLASSINFOtpe => CompoundType(readSymbolRef(), readTypes())
+        case REFINEDtpe                => val clazz = readSymbolRef();   RefinedType(readTypes(), symScope(clazz), clazz)
+        case CLASSINFOtpe              => val clazz = readSymbolRef(); ClassInfoType(readTypes(), symScope(clazz), clazz)
         case METHODtpe                 => MethodTypeRef(readTypeRef(), readSymbols())
         case POLYtpe                   => PolyOrNullaryType(readTypeRef(), readSymbols())
         case EXISTENTIALtpe            => ExistentialType(underlying = readTypeRef(), quantified = readSymbols())

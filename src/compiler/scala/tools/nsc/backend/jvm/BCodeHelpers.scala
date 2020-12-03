@@ -533,7 +533,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic {
         case LiteralAnnotArg(const) =>
           if (const.isNonUnitAnyVal) { av.visit(name, const.value) }
           else {
-            const.tag match {
+            (const.tag: @unchecked) match {
               case StringTag  =>
                 assert(const.value != null, const) // TODO this invariant isn't documented in `case class Constant`
                 av.visit(name, const.stringValue)  // `stringValue` special-cases null, but that execution path isn't exercised for a const with StringTag

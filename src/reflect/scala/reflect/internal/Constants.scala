@@ -70,7 +70,7 @@ trait Constants extends api.Constants {
     def isSuitableLiteralType = BooleanTag <= tag && tag <= NullTag
     def isAnyVal              = UnitTag <= tag && tag <= DoubleTag
 
-    def tpe: Type = tag match {
+    def tpe: Type = (tag: @switch @unchecked) match {
       case UnitTag    => UnitTpe
       case BooleanTag => BooleanTpe
       case ByteTag    => ByteTpe

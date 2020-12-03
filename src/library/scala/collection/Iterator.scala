@@ -719,7 +719,7 @@ trait Iterator[+A] extends IterableOnce[A] with IterableOnceOps[A, Iterator, Ite
         else Iterator.empty.next()
       }
       @tailrec
-      def finish(): Boolean = status match {
+      def finish(): Boolean = (status: @unchecked) match {
         case -2 => status = -1 ; true
         case -1 => false
         case  1 => store(hd) ; status = 0 ; finish()

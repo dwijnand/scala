@@ -350,7 +350,7 @@ object Map extends MapFactory[Map] {
       if (pred((key1, value1)) != isFlipped) {             {k1 = key1; v1 = value1}; n += 1}
       if (pred((key2, value2)) != isFlipped) { if (n == 0) {k1 = key2; v1 = value2}; n += 1}
 
-      n match {
+      (n: @unchecked) match {
         case 0 => Map.empty
         case 1 => new Map1(k1, v1)
         case 2 => this
@@ -457,7 +457,7 @@ object Map extends MapFactory[Map] {
       if (pred((key2, value2)) != isFlipped) { if (n == 0) { k1 = key2; v1 = value2 } else             { k2 = key2; v2 = value2 }; n += 1}
       if (pred((key3, value3)) != isFlipped) { if (n == 0) { k1 = key3; v1 = value3 } else if (n == 1) { k2 = key3; v2 = value3 }; n += 1}
 
-      n match {
+      (n: @unchecked) match {
         case 0 => Map.empty
         case 1 => new Map1(k1, v1)
         case 2 => new Map2(k1, v1, k2, v2)
@@ -581,7 +581,7 @@ object Map extends MapFactory[Map] {
       if (pred((key3, value3)) != isFlipped) { if (n == 0) { k1 = key3; v1 = value3 } else if (n == 1) { k2 = key3; v2 = value3 } else             { k3 = key3; v3 = value3};  n += 1}
       if (pred((key4, value4)) != isFlipped) { if (n == 0) { k1 = key4; v1 = value4 } else if (n == 1) { k2 = key4; v2 = value4 } else if (n == 2) { k3 = key4; v3 = value4 }; n += 1}
 
-      n match {
+      (n: @unchecked) match {
         case 0 => Map.empty
         case 1 => new Map1(k1, v1)
         case 2 => new Map2(k1, v1, k2, v2)

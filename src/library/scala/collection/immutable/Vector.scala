@@ -499,12 +499,12 @@ private final class Vector2[+A](_prefix1: Arr1, private[immutable] val len1: Int
     else slice0(0, length0-1)
 
   protected[immutable] def vectorSliceCount: Int = 3
-  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch) match {
+  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch @unchecked) match {
     case 0 => prefix1
     case 1 => data2
     case 2 => suffix1
   }
-  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch) match {
+  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch @unchecked) match {
     case 0 => len1
     case 1 => length0 - suffix1.length
     case 2 => length0
@@ -611,14 +611,14 @@ private final class Vector3[+A](_prefix1: Arr1, private[immutable] val len1: Int
     else slice0(0, length0-1)
 
   protected[immutable] def vectorSliceCount: Int = 5
-  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch) match {
+  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch @unchecked) match {
     case 0 => prefix1
     case 1 => prefix2
     case 2 => data3
     case 3 => suffix2
     case 4 => suffix1
   }
-  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch) match {
+  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch @unchecked) match {
     case 0 => len1
     case 1 => len12
     case 2 => len12 + data3.length*WIDTH2
@@ -743,7 +743,7 @@ private final class Vector4[+A](_prefix1: Arr1, private[immutable] val len1: Int
     else slice0(0, length0-1)
 
   protected[immutable] def vectorSliceCount: Int = 7
-  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch) match {
+  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch @unchecked) match {
     case 0 => prefix1
     case 1 => prefix2
     case 2 => prefix3
@@ -752,7 +752,7 @@ private final class Vector4[+A](_prefix1: Arr1, private[immutable] val len1: Int
     case 5 => suffix2
     case 6 => suffix1
   }
-  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch) match {
+  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch @unchecked) match {
     case 0 => len1
     case 1 => len12
     case 2 => len123
@@ -896,7 +896,7 @@ private final class Vector5[+A](_prefix1: Arr1, private[immutable] val len1: Int
     else slice0(0, length0-1)
 
   protected[immutable] def vectorSliceCount: Int = 9
-  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch) match {
+  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch @unchecked) match {
     case 0 => prefix1
     case 1 => prefix2
     case 2 => prefix3
@@ -907,7 +907,7 @@ private final class Vector5[+A](_prefix1: Arr1, private[immutable] val len1: Int
     case 7 => suffix2
     case 8 => suffix1
   }
-  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch) match {
+  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch @unchecked) match {
     case 0 => len1
     case 1 => len12
     case 2 => len123
@@ -1069,7 +1069,7 @@ private final class Vector6[+A](_prefix1: Arr1, private[immutable] val len1: Int
     else slice0(0, length0-1)
 
   protected[immutable] def vectorSliceCount: Int = 11
-  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch) match {
+  protected[immutable] def vectorSlice(idx: Int): Array[_ <: AnyRef] = (idx: @switch @unchecked) match {
     case 0 => prefix1
     case 1 => prefix2
     case 2 => prefix3
@@ -1082,7 +1082,7 @@ private final class Vector6[+A](_prefix1: Arr1, private[immutable] val len1: Int
     case 9 => suffix2
     case 10 => suffix1
   }
-  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch) match {
+  protected[immutable] def vectorSlicePrefixLength(idx: Int): Int = (idx: @switch @unchecked) match {
     case 0 => len1
     case 1 => len12
     case 2 => len123
@@ -1227,7 +1227,7 @@ private final class VectorSliceBuilder(lo: Int, hi: Int) {
       val prefix1 = slices(prefixIdx(1))
       val suffix1 = slices(suffixIdx(1))
       val len1 = prefix1.length
-      val res = (resultDim: @switch) match {
+      val res = (resultDim: @switch @unchecked) match {
         case 2 =>
           val data2 = dataOr(2, empty2)
           new Vector2[A](prefix1, len1, data2, suffix1, len)
@@ -1419,7 +1419,7 @@ final class VectorBuilder[A] extends ReusableBuilder[A, Vector[A]] {
   }
 
   private[immutable] def initFrom(v: Vector[_]): this.type = {
-    (v.vectorSliceCount: @switch) match {
+    (v.vectorSliceCount: @switch @unchecked) match {
       case 0 =>
       case 1 =>
         val v1 = v.asInstanceOf[Vector1[_]]
@@ -2005,7 +2005,7 @@ private final class NewVectorIterator[A](v: Vector[A], private[this] var totalLe
     }
     sliceStart = sliceEnd
     sliceDim = vectorSliceDim(sliceCount, sliceIdx)
-    (sliceDim: @switch) match {
+    (sliceDim: @switch @unchecked) match {
       case 1 => a1 = slice.asInstanceOf[Arr1]
       case 2 => a2 = slice.asInstanceOf[Arr2]
       case 3 => a3 = slice.asInstanceOf[Arr3]

@@ -803,7 +803,7 @@ object Regex {
      *  queries about the current match data pertain to the underlying matcher.
      */
     def hasNext: Boolean = {
-      nextSeen match {
+      (nextSeen: @unchecked) match {
         case 0 => nextSeen = if (matcher.find()) 1 else 3
         case 1 => ()
         case 2 => nextSeen = 0 ; hasNext
@@ -816,7 +816,7 @@ object Regex {
      *  As a side effect, advance the underlying matcher if necessary.
      */
     def next(): String = {
-      nextSeen match {
+      (nextSeen: @unchecked) match {
         case 0 => if (!hasNext) throw new NoSuchElementException ; next()
         case 1 => nextSeen = 2
         case 2 => nextSeen = 0 ; next()
@@ -829,7 +829,7 @@ object Regex {
     override def toString: String = super[AbstractIterator].toString
 
     // ensure we're at a match
-    private[this] def ensure(): Unit = nextSeen match {
+    private[this] def ensure(): Unit = (nextSeen: @unchecked) match {
       case 0 => if (!hasNext) throw new IllegalStateException
       case 1 => ()
       case 2 => ()

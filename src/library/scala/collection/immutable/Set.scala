@@ -195,7 +195,7 @@ object Set extends IterableFactory[Set] {
     def iterator: Iterator[A] = new SetNIterator[A](size) {
       def apply(i: Int) = getElem(i)
     }
-    private def getElem(i: Int) = i match { case 0 => elem1 case 1 => elem2 }
+    private def getElem(i: Int) = (i: @unchecked) match { case 0 => elem1 case 1 => elem2 }
 
     override def foreach[U](f: A => U): Unit = {
       f(elem1); f(elem2)
@@ -212,7 +212,7 @@ object Set extends IterableFactory[Set] {
       if (pred(elem1) != isFlipped) {             r1 = elem1; n += 1}
       if (pred(elem2) != isFlipped) { if (n == 0) r1 = elem2; n += 1}
 
-      n match {
+      (n: @unchecked) match {
         case 0 => Set.empty
         case 1 => new Set1(r1)
         case 2 => this
@@ -246,7 +246,7 @@ object Set extends IterableFactory[Set] {
     def iterator: Iterator[A] = new SetNIterator[A](size) {
       def apply(i: Int) = getElem(i)
     }
-    private def getElem(i: Int) = i match { case 0 => elem1 case 1 => elem2 case 2 => elem3 }
+    private def getElem(i: Int) = (i: @unchecked) match { case 0 => elem1 case 1 => elem2 case 2 => elem3 }
 
     override def foreach[U](f: A => U): Unit = {
       f(elem1); f(elem2); f(elem3)
@@ -264,7 +264,7 @@ object Set extends IterableFactory[Set] {
       if (pred(elem2) != isFlipped) { if (n == 0) r1 = elem2 else             r2 = elem2; n += 1}
       if (pred(elem3) != isFlipped) { if (n == 0) r1 = elem3 else if (n == 1) r2 = elem3; n += 1}
 
-      n match {
+      (n: @unchecked) match {
         case 0 => Set.empty
         case 1 => new Set1(r1)
         case 2 => new Set2(r1, r2)
@@ -301,7 +301,7 @@ object Set extends IterableFactory[Set] {
     def iterator: Iterator[A] = new SetNIterator[A](size) {
       def apply(i: Int) = getElem(i)
     }
-    private def getElem(i: Int) = i match { case 0 => elem1 case 1 => elem2 case 2 => elem3 case 3 => elem4 }
+    private def getElem(i: Int) = (i: @unchecked) match { case 0 => elem1 case 1 => elem2 case 2 => elem3 case 3 => elem4 }
 
     override def foreach[U](f: A => U): Unit = {
       f(elem1); f(elem2); f(elem3); f(elem4)
@@ -320,7 +320,7 @@ object Set extends IterableFactory[Set] {
       if (pred(elem3) != isFlipped) { if (n == 0) r1 = elem3 else if (n == 1) r2 = elem3 else             r3 = elem3; n += 1}
       if (pred(elem4) != isFlipped) { if (n == 0) r1 = elem4 else if (n == 1) r2 = elem4 else if (n == 2) r3 = elem4; n += 1}
 
-      n match {
+      (n: @unchecked) match {
         case 0 => Set.empty
         case 1 => new Set1(r1)
         case 2 => new Set2(r1, r2)

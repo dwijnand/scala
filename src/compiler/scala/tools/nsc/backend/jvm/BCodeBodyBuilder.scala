@@ -1191,7 +1191,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       }
     }
 
-    def testOpForPrimitive(primitiveCode: Int) = (primitiveCode: @switch) match {
+    def testOpForPrimitive(primitiveCode: Int) = (primitiveCode: @switch @unchecked) match {
       case scalaPrimitives.ID => TestOp.EQ
       case scalaPrimitives.NI => TestOp.NE
       case scalaPrimitives.EQ => TestOp.EQ
