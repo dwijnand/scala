@@ -1,0 +1,9 @@
+t9657.scala:15: warning: unreachable code
+    case Bicycle => ???      // expected unreachable 1
+                    ^
+t9657.scala:21: warning: unreachable code
+    case _: Bicycle.type => ???      // expected unreachable 2
+                            ^
+error: No warnings can be incurred under -Werror.
+2 warnings
+1 error

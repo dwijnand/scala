@@ -97,14 +97,31 @@ trait TreeAndTypeAnalysis extends Debugging {
       if (parentSubtypes.exists(_.nonEmpty)) {
         // If any of the parents is enumerable, then the refinement type is enumerable.
         // We must only include subtypes of the parents that conform to `tpApprox`.
-        // See neg/virtpatmat_exhaust_compound.scala and pos/t9657.scala for examples.
-        val approximateTypeSkolemsToUpperBound = new TypeMap { // from approximateAbstracts
-          def apply(tp: Type): Type = tp.dealiasWiden match {
-            case TypeRef(_, sym, _) if sym.isTypeSkolem => tp.upperBound
-            case _                                      => mapOver(tp)
+        // See neg/virtpatmat_exhaust_compound.scala for a base example,
+        // and pos/t9657.scala & pos/t9657-less-fishy.scala for examples involving type skolems.
+        val deskolemizeAliases = new TypeMap { // from approximateAbstracts
+          def apply(tp: Type) = mapOver(tp)
+
+          // The default only allows mapping the types of the symbols
+          // but we need to map the symbols themselves
+          override def mapOver(syms: List[Symbol]) = syms.mapConserve(deskolemizeAlias)
+
+          /** Replace any alias type symbols which dealias to type skolems
+           *  with new abstract types, assigning the de-skolemized's type to it.
+           *
+           *  For example, in `def m[A <: B](x: X { type U = A }): X = x`
+           *  replace `type U = A` with `type U <: B`.
+           */
+          private def deskolemizeAlias(sym: Symbol) = {
+            val dealiasedSym = sym.info.typeSymbol
+            if (dealiasedSym.isTypeSkolem) {
+              sym.owner.newAbstractType(sym.name.toTypeName, sym.pos, sym.flags).setInfo {
+                dealiasedSym.deSkolemize.info
+              }
+            } else sym
           }
         }
-        val tpApprox = approximateTypeSkolemsToUpperBound(tp)
+        val tpApprox = deskolemizeAliases(tp)
         parentSubtypes.map(_.filter(_ <:< tpApprox))
       } else Nil
     }
