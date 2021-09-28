@@ -94,6 +94,10 @@ trait Traversable[+A] extends TraversableLike[A, Traversable[A]]
  *  The current default implementation of a $Coll is a `List`.
  */
 object Traversable extends TraversableFactory[Traversable] { self =>
+  override def buildFromOrNull[A](source: TraversableOnce[A]): Traversable[A] = source match {
+    case c: immutable.Traversable[A] => c
+    case _ => null
+  }
 
   /** Provides break functionality separate from client code */
   private[collection] val breaks: Breaks = new Breaks

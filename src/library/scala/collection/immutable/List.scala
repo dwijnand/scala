@@ -494,6 +494,11 @@ final case class ::[B](override val head: B, private[scala] var tl: List[B]) ext
  *  @define Coll `List`
  */
 object List extends SeqFactory[List] {
+  override def buildFromOrNull[A](source: TraversableOnce[A]): List[A] = source match {
+    case c: List[A] => c
+    case _ => null
+  }
+
   /** $genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, List[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]

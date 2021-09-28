@@ -45,6 +45,10 @@ trait Iterable[+A] extends Traversable[A]
  *  @define Coll `Iterable`
  */
 object Iterable extends TraversableFactory[Iterable] {
+  override def buildFromOrNull[A](source: TraversableOnce[A]): Iterable[A] = source match {
+    case c: immutable.Iterable[A] => c
+    case _ => null
+  }
 
   /** $genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Iterable[A]] = ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]

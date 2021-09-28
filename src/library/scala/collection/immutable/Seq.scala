@@ -43,6 +43,11 @@ trait Seq[+A] extends Iterable[A]
  *  @define coll immutable sequence
  */
 object Seq extends SeqFactory[Seq] {
+  override def buildFromOrNull[A](source: TraversableOnce[A]): Seq[A] = source match {
+    case c: Seq[A] => c
+    case _ => null
+  }
+
   /** genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Seq[A]] = ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, Seq[A]] = new mutable.ListBuffer

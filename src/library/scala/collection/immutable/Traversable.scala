@@ -47,6 +47,11 @@ trait Traversable[+A] extends scala.collection.Traversable[A]
  *  @define Coll `immutable.Traversable`
  */
 object Traversable extends TraversableFactory[Traversable] {
+  override def buildFromOrNull[A](source: TraversableOnce[A]): Traversable[A] = source match {
+    case c: Traversable[A] => c
+    case _ => null
+  }
+
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Traversable[A]] = ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, Traversable[A]] = new mutable.ListBuffer
 }

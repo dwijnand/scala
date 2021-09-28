@@ -779,13 +779,9 @@ trait TraversableLike[+A, +Repr] extends Any
 
   def toIterator: Iterator[A] = toStream.iterator
   def toStream: Stream[A] = toBuffer.toStream
-  // Override to provide size hint.
-  override def to[Col[_]](implicit cbf: CanBuildFrom[Nothing, A, Col[A @uV]]): Col[A @uV] = {
-    val b = cbf()
-    b.sizeHint(this)
-    b ++= thisCollection
-    b.result
-  }
+
+  // Override for bin compat
+  override def to[Col[_]](implicit cbf: CanBuildFrom[Nothing, A, Col[A @uV]]): Col[A @uV] = super.to(cbf)
 
   /** Converts this $coll to a string.
    *

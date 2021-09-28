@@ -31,6 +31,14 @@ import scala.annotation.implicitNotFound
  */
 @implicitNotFound(msg = "Cannot construct a collection of type ${To} with elements of type ${Elem} based on a collection of type ${From}.")
 trait CanBuildFrom[-From, -Elem, +To] {
+  def buildFrom(source: TraversableOnce[Elem]): To = {
+    val b = apply()
+    source match {
+      case tl: TraversableLike[_, _] => b.sizeHint(tl)
+      case _ =>
+    }
+    b.++=(source).result()
+  }
 
   /** Creates a new builder on request of a collection.
    *  @param from  the collection requesting the builder to be created.

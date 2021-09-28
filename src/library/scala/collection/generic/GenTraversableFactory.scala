@@ -46,12 +46,19 @@ extends GenericCompanion[CC] {
   }
   def ReusableCBF: GenericCanBuildFrom[Nothing] = ReusableCBFInstance
 
+  def buildFromOrNull[A](source: TraversableOnce[A]): CC[A] = null.asInstanceOf[CC[A]]
+
   /** A generic implementation of the `CanBuildFrom` trait, which forwards
    *  all calls to `apply(from)` to the `genericBuilder` method of
    *  $coll `from`, and which forwards all calls of `apply()` to the
    *  `newBuilder` method of this factory.
    */
   class GenericCanBuildFrom[A] extends CanBuildFrom[CC[_], A, CC[A]] {
+    override def buildFrom(source: TraversableOnce[A]): CC[A] = {
+      val f = buildFromOrNull(source)
+      if (f ne null) f else super.buildFrom(source)
+    }
+
     /** Creates a new builder on request of a collection.
      *  @param from  the collection requesting the builder to be created.
      *  @return the result of invoking the `genericBuilder` method on `from`.

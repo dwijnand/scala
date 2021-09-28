@@ -42,6 +42,11 @@ trait Iterable[+A] extends Traversable[A]
  *  @define coll immutable iterable collection
  */
 object Iterable extends TraversableFactory[Iterable] {
+  override def buildFromOrNull[A](source: TraversableOnce[A]): Iterable[A] = source match {
+    case c: Iterable[A] => c
+    case _ => null
+  }
+
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Iterable[A]] = ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, Iterable[A]] = new mutable.ListBuffer
 }

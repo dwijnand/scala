@@ -361,11 +361,7 @@ trait TraversableOnce[+A] extends Any with GenTraversableOnce[A] {
 
   def toVector: Vector[A] = to[Vector]
 
-  def to[Col[_]](implicit cbf: CanBuildFrom[Nothing, A, Col[A @uV]]): Col[A @uV] = {
-    val b = cbf()
-    b ++= seq
-    b.result()
-  }
+  def to[Col[_]](implicit cbf: CanBuildFrom[Nothing, A, Col[A @uV]]): Col[A @uV] = cbf.buildFrom(this)
 
   def toMap[T, U](implicit ev: A <:< (T, U)): immutable.Map[T, U] = {
     val b = immutable.Map.newBuilder[T, U]

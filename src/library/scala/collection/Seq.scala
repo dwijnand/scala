@@ -35,6 +35,11 @@ trait Seq[+A] extends PartialFunction[Int, A]
  *  @define Coll `Seq`
  */
 object Seq extends SeqFactory[Seq] {
+  override def buildFromOrNull[A](source: TraversableOnce[A]): Seq[A] = source match {
+    case c: immutable.Seq[A] => c
+    case _ => null
+  }
+
   /** $genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Seq[A]] = ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 

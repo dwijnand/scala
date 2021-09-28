@@ -42,6 +42,11 @@ trait IndexedSeq[+A] extends Seq[A]
  *  @define Coll `IndexedSeq`
  */
 object IndexedSeq extends IndexedSeqFactory[IndexedSeq] {
+  override def buildFromOrNull[A](source: TraversableOnce[A]): IndexedSeq[A] = source match {
+    case c: IndexedSeq[A] => c
+    case _ => null
+  }
+
   class Impl[A](buf: ArrayBuffer[A]) extends AbstractSeq[A] with IndexedSeq[A] with Serializable {
     def length = buf.length
     def apply(idx: Int) = buf.apply(idx)

@@ -647,6 +647,12 @@ private[scala] abstract class LowPriorityImplicits {
 
   implicit def fallbackStringCanBuildFrom[T]: CanBuildFrom[String, T, immutable.IndexedSeq[T]] =
     new CanBuildFrom[String, T, immutable.IndexedSeq[T]] {
+
+      override def buildFrom(source: TraversableOnce[T]): immutable.IndexedSeq[T] = {
+        val f = immutable.IndexedSeq.buildFromOrNull(source)
+        if (f ne null) f else super.buildFrom(source)
+      }
+
       def apply(from: String) = immutable.IndexedSeq.newBuilder[T]
       def apply() = immutable.IndexedSeq.newBuilder[T]
     }
